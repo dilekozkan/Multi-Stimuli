@@ -32,9 +32,11 @@ kutu1.addWidget(frekans)
 kutu1.addWidget(pattern)
 
 
+
 kutu2=QHBoxLayout()
 
 label1=QLabel("   Whisker")
+
 buton1=QDoubleSpinBox()
 buton1.setFixedSize(200,25)
 buton1.setAlignment(Qt.AlignLeft)
