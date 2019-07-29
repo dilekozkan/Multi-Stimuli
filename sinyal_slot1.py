@@ -36,12 +36,12 @@ class ana_pencere(QWidget):
 
     def secim1(self):
 
-        self.isaret.setText("Yeni sayi: %60")
-        self.slider.setValue(60)
+        self.slider.setValue(int(self.buton1.text()))
+        self.isaret.setText(self.buton1.text())
 
     def secim2(self):
-        self.slider.setValue(70)
-        self.isaret.setText("Yeni sayi: %70")
+        self.slider.setValue(int(self.buton2.text()))
+        self.isaret.setText(self.buton2.text())
 
 
 if __name__=="__main__":
