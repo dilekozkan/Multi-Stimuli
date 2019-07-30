@@ -13,12 +13,13 @@ class ana_pencere(QWidget):
 
         self.kutu=QVBoxLayout()
 
-        self.soru=QLabel("Bir sayı seçiniz:")
+        self.soru=QLabel("Bir sayı seçiniz veya slider'ı kaydırınız")
 
         self.buton1=QPushButton("60")
         self.buton2=QPushButton("70")
         self.slider = QSlider()
         self.isaret=QLabel(" Şu an %0 ")
+
 
         self.kutu.addWidget(self.soru)
         self.kutu.addWidget(self.buton1)
@@ -28,6 +29,7 @@ class ana_pencere(QWidget):
 
         self.buton1.clicked.connect(self.secim1)
         self.buton2.clicked.connect(self.secim2)
+        self.slider.valueChanged.connect(self.secim3)
 
 
         self.window.setLayout(self.kutu)
@@ -43,6 +45,9 @@ class ana_pencere(QWidget):
         self.slider.setValue(int(self.buton2.text()))
         self.isaret.setText(self.buton2.text())
 
+
+    def secim3(self):
+        self.isaret.setText("Slider {}'a kaydırıldı".format(self.slider.value()))
 
 if __name__=="__main__":
     app=QApplication(sys.argv)
