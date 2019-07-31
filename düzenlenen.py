@@ -83,10 +83,18 @@ class Ana_pencere(QWidget):
         self.buton8.addItem("Sinuzoidal")
         self.bosluk = QLabel("")
 
-        self.kurgu=QLabel("hoşgeldiniz!, deney seçiniz ")              #kurgu için
-        self.kurgu2=QLabel("")
-        self.yeni=QLabel("yeni pencere")
-        self.yazı=QLabel("deneyiniz hazırlanıyor")
+        self.buton1.valueChanged.connect(self.frequency_stim1)
+        self.buton2.valueChanged.connect(self.frequency_stim2)
+        self.buton3.valueChanged.connect(self.frequency_stim3)
+        self.buton4.valueChanged.connect(self.frequency_stim4)
+
+
+        self.buton5.currentIndexChanged.connect(self.pattern_stim1)
+        self.buton6.currentIndexChanged.connect(self.pattern_stim2)
+        self.buton7.currentIndexChanged.connect(self.pattern_stim3)
+        self.buton8.currentIndexChanged.connect(self.pattern_stim4)
+
+
 
         self.form = QFormLayout()
         self.form.addRow(self.bosluk)
@@ -101,25 +109,62 @@ class Ana_pencere(QWidget):
         self.form.addRow(self.stim4, self.kutu5)
         self.form.addRow(self.bosluk)
         self.form.addRow(self.bosluk)
-        self.form.addRow(self.kurgu)
-        self.form.addRow(self.kurgu2)
+
 
         self.main_widget.setLayout(self.form)
 
         self.main_widget.show()
 
-    def experiment1(self):
+    def experiment1(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
         if self.stim1.isChecked():
-            self.kurgu.setText("seçilen deney :whisker ")  #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
+            pass
     def experiment2(self):
         if self.stim2.isChecked():
-            self.kurgu2.setText("seçilen deney :Auditive")     #bu kısımda genel kültür amaçlı sorum var!
+            pass
     def experiment3(self):
         if self.stim3.isChecked():
-            self.form.addRow(self.yeni)
+            pass
     def experiment4(self):
         if self.stim4.isChecked():
-            self.form.addRow(self.yazı)
+            pass
+
+    def frequency_stim1(self):
+        frequency1=self.buton1.value()
+
+    def frequency_stim2(self):
+        frequency2 = self.buton2.value()
+
+    def frequency_stim3(self):
+        frequency3 = self.buton3.value()
+
+    def frequency_stim4(self):
+        frequency4 = self.buton4.value()
+
+    def pattern_stim1(self):
+        if self.buton5.currentText()=="Binary":
+            pass                                                                                                
+        elif self.buton5.currentText()=="Sinuzoidal":
+            pass
+
+    def pattern_stim2(self):
+        if self.buton6.currentText()=="Binary":
+            pass
+        elif self.buton6.currentText()=="Sinuzoidal":
+            pass
+
+    def pattern_stim3(self):
+        if self.buton7.currentText()=="Binary":
+            pass
+        elif self.buton7.currentText()=="Sinuzoidal":
+            pass
+
+    def pattern_stim4(self):
+        if self.buton8.currentText()=="Binary":
+            pass
+        elif self.buton8.currentText()=="Sinuzoidal":
+            pass
+
+
 
 
 
