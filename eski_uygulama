@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import QGridLayout
+
 
 class Ana_pencere(QWidget):
     def __init__(self):
@@ -11,18 +11,29 @@ class Ana_pencere(QWidget):
         self.main_widget.setGeometry(450, 100, 900, 600)
         self.main_widget.setWindowTitle("MULTI-STIMULI PROCESS")
         self.main_widget.setMinimumSize(900, 600)
+        self.main_widget.setMaximumSize(900,600)
 
-        self.stim1 = QCheckBox()
+        self.stimodour1 = QCheckBox()
+        self.stimodour2 = QCheckBox()
         self.stim2 = QCheckBox()
         self.stim3 = QCheckBox()
         self.stim4 = QCheckBox()
-
-
-        self.stim1.toggled.connect(self.experiment1)
+        
+    
+        self.stimodour1.toggled.connect(self.odour1experiment)
+        self.stimodour2.toggled.connect(self.odour2experiment)
         self.stim2.toggled.connect(self.experiment2)
         self.stim3.toggled.connect(self.experiment3)
         self.stim4.toggled.connect(self.experiment4)
+        
+        
+        self.boxofcheck=QHBoxLayout()
+        self.apply=QPushButton("APPLY")
+        self.cancel=QPushButton("CANCEL")
 
+        self.boxofcheck.addWidget(self.apply)
+        self.boxofcheck.addWidget(self.cancel)
+        self.cancel.clicked.connect(self.def_cancel)
 
         self.kutu1 = QHBoxLayout()
 
@@ -36,13 +47,28 @@ class Ana_pencere(QWidget):
         self.kutu1.addWidget(self.pattern)
 
         self.kutu2 = QHBoxLayout()
+        self.yenikutu=QHBoxLayout()
+        self.yenikutu2= QHBoxLayout()
 
-        self.label1 = QLabel("   Whisker")
-        self.buton1 = QDoubleSpinBox()
-        self.buton5 = QComboBox()
+        self.label1 = QLabel("        Odours")
+        self.label1.move(800,500)
+        self.odour1=QLabel("   Odour 1")
+        self.odour2 = QLabel("   Odour 2")
+        self.odour1buton1 = QDoubleSpinBox()
+        self.odour1buton1.setFixedSize(100, 30)
+        self.odour1buton2 = QComboBox()
+        self.odour1buton2.setFixedSize(100, 30)
+
+        self.odour2buton1 = QDoubleSpinBox()
+        self.odour2buton2 = QComboBox()
         self.kutu2.addWidget(self.label1)
-        self.kutu2.addWidget(self.buton1)
-        self.kutu2.addWidget(self.buton5)
+        self.yenikutu.addWidget(self.odour1)
+        self.yenikutu.addWidget(self.odour1buton1)
+        self.yenikutu.addWidget(self.odour1buton2)
+        self.yenikutu2.addWidget(self.odour2)
+        self.yenikutu2.addWidget(self.odour2buton1)
+        self.yenikutu2.addWidget(self.odour2buton2)
+
 
         self.kutu3 = QHBoxLayout()
         self.label2 = QLabel("   Auditive")
@@ -62,16 +88,17 @@ class Ana_pencere(QWidget):
         self.kutu4.addWidget(self.buton7)
 
         self.kutu5 = QHBoxLayout()
-        self.label4 = QLabel("   Odour")
+        self.label4 = QLabel("   Whisker")
         self.buton4 = QDoubleSpinBox()
         self.buton8 = QComboBox()
         self.kutu5.addWidget(self.label4)
         self.kutu5.addWidget(self.buton4)
         self.kutu5.addWidget(self.buton8)
 
-        self.buton5.addItem(" ")
-        self.buton5.addItem("Binary")
-        self.buton5.addItem("Sinuzoidal")
+        self.odour1buton2.addItem(" ")
+        self.odour1buton2.addItem("Binary")
+        self.odour2buton2.addItem(" ")
+        self.odour2buton2.addItem("Binary")
         self.buton6.addItem(" ")
         self.buton6.addItem("Binary")
         self.buton6.addItem("Sinuzoidal")
@@ -83,16 +110,28 @@ class Ana_pencere(QWidget):
         self.buton8.addItem("Sinuzoidal")
         self.bosluk = QLabel("")
 
-        self.buton1.valueChanged.connect(self.frequency_stim1)
+        self.odour1buton1.valueChanged.connect(self.frequency_odour1)
+        self.odour2buton1.valueChanged.connect(self.frequency_odour2)
+
         self.buton2.valueChanged.connect(self.frequency_stim2)
         self.buton3.valueChanged.connect(self.frequency_stim3)
         self.buton4.valueChanged.connect(self.frequency_stim4)
 
 
-        self.buton5.currentIndexChanged.connect(self.pattern_stim1)
+        self.odour1buton2.currentIndexChanged.connect(self.pattern_odour1)
+        self.odour2buton2.currentIndexChanged.connect(self.pattern_odour2)
         self.buton6.currentIndexChanged.connect(self.pattern_stim2)
         self.buton7.currentIndexChanged.connect(self.pattern_stim3)
         self.buton8.currentIndexChanged.connect(self.pattern_stim4)
+
+        self.information = QHBoxLayout()
+        self.time_label = QLabel("       Time of Experiment(sec) = 20 ")
+        self.frequency_label = QLabel("                                Number of Experiment    ")
+        self.frequency_experiment = QSpinBox()
+        self.frequency_experiment.setFixedSize(100, 30)
+        self.information.addWidget(self.time_label)
+        self.information.addWidget(self.frequency_label)
+        self.information.addWidget(self.frequency_experiment)
 
 
 
@@ -100,7 +139,11 @@ class Ana_pencere(QWidget):
         self.form.addRow(self.bosluk)
         self.form.addRow(self.kutu1)
         self.form.addRow(self.bosluk)
-        self.form.addRow(self.stim1, self.kutu2)
+
+        self.form.addRow(self.bosluk)
+        self.form.addRow(self.stimodour1, self.yenikutu)
+        self.form.addRow(self.bosluk)
+        self.form.addRow(self.stimodour2, self.yenikutu2)
         self.form.addRow(self.bosluk)
         self.form.addRow(self.stim2, self.kutu3)
         self.form.addRow(self.bosluk)
@@ -108,15 +151,20 @@ class Ana_pencere(QWidget):
         self.form.addRow(self.bosluk)
         self.form.addRow(self.stim4, self.kutu5)
         self.form.addRow(self.bosluk)
+        self.form.addRow(self.information)
         self.form.addRow(self.bosluk)
+        self.form.addRow(self.boxofcheck)
 
 
         self.main_widget.setLayout(self.form)
 
         self.main_widget.show()
 
-    def experiment1(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
-        if self.stim1.isChecked():
+    def odour1experiment(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
+        if self.stimodour1.isChecked():
+            pass
+    def odour2experiment(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
+        if self.stimodour2.isChecked():
             pass
     def experiment2(self):
         if self.stim2.isChecked():
@@ -128,8 +176,11 @@ class Ana_pencere(QWidget):
         if self.stim4.isChecked():
             pass
 
-    def frequency_stim1(self):
-        frequency1=self.buton1.value()
+    def frequency_odour1(self):
+        frequency1=self.odour1buton1.value()
+
+    def frequency_odour2(self):
+        frequency1 = self.odour2buton1.value()
 
     def frequency_stim2(self):
         frequency2 = self.buton2.value()
@@ -140,10 +191,12 @@ class Ana_pencere(QWidget):
     def frequency_stim4(self):
         frequency4 = self.buton4.value()
 
-    def pattern_stim1(self):
-        if self.buton5.currentText()=="Binary":
-            pass                                                                                                
-        elif self.buton5.currentText()=="Sinuzoidal":
+    def pattern_odour1(self):
+        if self.odour1buton2.currentText()=="Binary":
+            pass
+
+    def pattern_odour2(self):
+        if self.odour2buton2.currentText() == "Binary":
             pass
 
     def pattern_stim2(self):
@@ -164,29 +217,11 @@ class Ana_pencere(QWidget):
         elif self.buton8.currentText()=="Sinuzoidal":
             pass
 
+    def def_apply(self):
+        pass
+    def def_cancel(self):
+        sys.exit(app.exec())
 
-
-
-
-
-
-
-
-
-"""
-sonra en alta eklenecek !
-
-
-information=QHBoxLayout()
-time_label=QLabel("       Time of Experiment(sec) = 20 ")
-frequency_label=QLabel("                                Frequency of Experiment    ")
-frequency_experiment=  QSpinBox()
-frequency_experiment.setFixedSize(100,30)
-information.addWidget(time_label)
-information.addWidget(frequency_label)
-information.addWidget(frequency_experiment)
-
-"""
 
 if __name__=="__main__":
     app=QApplication(sys.argv)
