@@ -1,6 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+import RPi.GPIO as GPIO
+import time
 
 
 class Ana_pencere(QWidget):
@@ -8,59 +10,48 @@ class Ana_pencere(QWidget):
         super().__init__()
         self.main_widget = QWidget()
 
-        self.main_widget.setGeometry(450, 100, 900, 600)
+        self.main_widget.setGeometry(450, 100, 950, 800)
         self.main_widget.setWindowTitle("MULTI-STIMULI PROCESS")
-        self.main_widget.setMinimumSize(900, 600)
-        self.main_widget.setMaximumSize(900,600)
+        #self.main_widget.setFixedSize(900, 600)
+        #self.main_widget.setMinimumSize(900, 600)
+        #self.main_widget.setMaximumSize(900, 600)
 
         self.stimodour1 = QCheckBox()
         self.stimodour2 = QCheckBox()
         self.stim2 = QCheckBox()
         self.stim3 = QCheckBox()
         self.stim4 = QCheckBox()
-        
-    
+
         self.stimodour1.toggled.connect(self.odour1experiment)
         self.stimodour2.toggled.connect(self.odour2experiment)
         self.stim2.toggled.connect(self.experiment2)
         self.stim3.toggled.connect(self.experiment3)
         self.stim4.toggled.connect(self.experiment4)
-        
-        
-
-        self.apply=QPushButton("APPLY")
-        self.apply.setFixedSize(100,28)
-        self.cancel=QPushButton("CANCEL")
-        self.cancel.setFixedSize(100, 28)
-
-
-        self.apply.move(100,500)
-        self.cancel.clicked.connect(self.def_cancel)
-
 
         self.kutu1 = QHBoxLayout()
 
         self.bos = QLabel("")
         self.tipler = QLabel("       Types of Stimulations")  # alignment'la ayarlanacak
-        self.frekans = QLabel("   Frequency (Hz)")  # move yapınca pencereyi küçültürsen kayboluyor, yani hizalamıyor
-        self.pattern = QLabel("  Pattern")
+        self.tipler.setAlignment(Qt.AlignLeft)
+        self.frekans = QLabel("Frequency (Hz)")  # move yapınca pencereyi küçültürsen kayboluyor, yani hizalamıyor
+        self.frekans.setAlignment(Qt.AlignHCenter)
+        self.pattern = QLabel("Pattern")
+        self.pattern.setAlignment(Qt.AlignCenter)
 
         self.kutu1.addWidget(self.tipler)
         self.kutu1.addWidget(self.frekans)
         self.kutu1.addWidget(self.pattern)
 
         self.kutu2 = QHBoxLayout()
-        self.yenikutu=QHBoxLayout()
-        self.yenikutu2= QHBoxLayout()
+        self.yenikutu = QHBoxLayout()
+        self.yenikutu2 = QHBoxLayout()
 
         self.label1 = QLabel("        Odours")
         #self.label1.move(800,500)
-        self.odour1=QLabel("   Odour 1")
+        self.odour1 = QLabel("   Odour 1")
         self.odour2 = QLabel("   Odour 2")
         self.odour1buton1 = QDoubleSpinBox()
-
         self.odour1buton2 = QComboBox()
-
 
         self.odour2buton1 = QDoubleSpinBox()
         self.odour2buton2 = QComboBox()
@@ -71,7 +62,6 @@ class Ana_pencere(QWidget):
         self.yenikutu2.addWidget(self.odour2)
         self.yenikutu2.addWidget(self.odour2buton1)
         self.yenikutu2.addWidget(self.odour2buton2)
-
 
         self.kutu3 = QHBoxLayout()
         self.label2 = QLabel("   Auditive")
@@ -120,7 +110,6 @@ class Ana_pencere(QWidget):
         self.buton3.valueChanged.connect(self.frequency_stim3)
         self.buton4.valueChanged.connect(self.frequency_stim4)
 
-
         self.odour1buton2.currentIndexChanged.connect(self.pattern_odour1)
         self.odour2buton2.currentIndexChanged.connect(self.pattern_odour2)
         self.buton6.currentIndexChanged.connect(self.pattern_stim2)
@@ -128,15 +117,32 @@ class Ana_pencere(QWidget):
         self.buton8.currentIndexChanged.connect(self.pattern_stim4)
 
         self.information = QHBoxLayout()
-        self.time_label = QLabel("       Time of Experiment(sec) = 20 ")
-        self.frequency_label = QLabel("                          Number of Experiment ")
+        self.time_label = QLabel("         Time of Experiment(sec)")
+        self.time_label.setAlignment(Qt.AlignLeft)
+        self.time_choose =QSpinBox()
+        self.time_choose.setFixedSize(100, 25)
+        self.time_choose.setValue(23)
+        self.time_choose.setAlignment(Qt.AlignLeft)
+        self.frequency_label = QLabel("Number of Experiment")
+        self.frequency_label.setAlignment(Qt.AlignRight)
         self.frequency_experiment = QSpinBox()
-        self.frequency_experiment.setFixedSize(100, 28)
+        self.frequency_experiment.setFixedSize(100, 25)
+        self.frequency_experiment.setAlignment(Qt.AlignRight)
         self.information.addWidget(self.time_label)
+        self.information.addWidget(self.time_choose)
         self.information.addWidget(self.frequency_label)
         self.information.addWidget(self.frequency_experiment)
+        self.boxofcontrol = QHBoxLayout()
+        self.boxofcontrol.setAlignment(Qt.AlignRight)
 
-
+        self.apply = QPushButton("APPLY")
+        self.apply.setFixedSize(100, 28)
+        self.cancel = QPushButton("CANCEL")
+        self.cancel.setFixedSize(100, 28)
+        self.cancel.clicked.connect(self.def_cancel)
+        self.apply.clicked.connect(self.def_apply)
+        self.boxofcontrol.addWidget(self.apply)
+        self.boxofcontrol.addWidget(self.cancel)
 
         self.form = QFormLayout()
         self.form.addRow(self.bosluk)
@@ -156,77 +162,159 @@ class Ana_pencere(QWidget):
         self.form.addRow(self.bosluk)
         self.form.addRow(self.information)
         self.form.addRow(self.bosluk)
-
-
+        self.form.addRow(self.boxofcontrol)
 
         self.main_widget.setLayout(self.form)
-
         self.main_widget.show()
 
-    def odour1experiment(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
-        if self.stimodour1.isChecked():
-            pass
-    def odour2experiment(self):                            #bu kısımları deneyle entegre ettiğimde düzenleyeceğim
-        if self.stimodour2.isChecked():
-            pass
+        self.ttl_out = 16  # TTL Output
+        GPIO.setup(self.ttl_out, GPIO.IN)
+        self.var1 = GPIO.input(self.ttl_out)
+        self.airTime = 20;  # 29.75
+        self.odorTime = 1;
+        self.sleepTime3 = 5;
+        self.delayTime = 2;
+
+
+
+    def odour1experiment(self):  # bu kısımları deneyle entegre ettiğimde düzenleyeceğim
+        self.valve1 = 3  # VALVE 1
+        self.valve3 = 5  # VALVE 3
+        self.valve2 = 7  # VALVE 2
+        self.valve4 = 11  # VALVE 4
+        self.valve5 = 13  # VALVE 5
+        self.valve6 = 15  # VALVE 6
+
+        # Pin Setup:
+        GPIO.setmode(GPIO.BOARD)
+
+        GPIO.setup(self.valve1, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve2, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve3, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve4, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve5, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve6, GPIO.OUT)  # PWM pin set as output
+
+        GPIO.output(self.valve1, GPIO.LOW)
+        GPIO.output(self.valve2, GPIO.LOW)
+        GPIO.output(self.valve4, GPIO.LOW)
+        GPIO.output(self.valve5, GPIO.LOW)
+        GPIO.output(self.valve3, GPIO.HIGH)
+        GPIO.output(self.valve6, GPIO.HIGH)
+
+
+    def odour2experiment(self):  # bu kısımları deneyle entegre ettiğimde düzenleyeceğim
+        pass
+
     def experiment2(self):
         if self.stim2.isChecked():
             pass
+
+
     def experiment3(self):
         if self.stim3.isChecked():
             pass
+
+
     def experiment4(self):
         if self.stim4.isChecked():
             pass
 
+
     def frequency_odour1(self):
-        frequency1=self.odour1buton1.value()
+        frequency1 = self.odour1buton1.value()
+
 
     def frequency_odour2(self):
         frequency1 = self.odour2buton1.value()
 
+
     def frequency_stim2(self):
         frequency2 = self.buton2.value()
+
 
     def frequency_stim3(self):
         frequency3 = self.buton3.value()
 
+
     def frequency_stim4(self):
         frequency4 = self.buton4.value()
 
+
     def pattern_odour1(self):
-        if self.odour1buton2.currentText()=="Binary":
+        if self.odour1buton2.currentText() == "Binary":
             pass
+
 
     def pattern_odour2(self):
         if self.odour2buton2.currentText() == "Binary":
             pass
 
+
     def pattern_stim2(self):
-        if self.buton6.currentText()=="Binary":
+        if self.buton6.currentText() == "Binary":
             pass
-        elif self.buton6.currentText()=="Sinuzoidal":
+        elif self.buton6.currentText() == "Sinuzoidal":
             pass
+
 
     def pattern_stim3(self):
-        if self.buton7.currentText()=="Binary":
+        if self.buton7.currentText() == "Binary":
             pass
-        elif self.buton7.currentText()=="Sinuzoidal":
+        elif self.buton7.currentText() == "Sinuzoidal":
             pass
+
 
     def pattern_stim4(self):
-        if self.buton8.currentText()=="Binary":
+        if self.buton8.currentText() == "Binary":
             pass
-        elif self.buton8.currentText()=="Sinuzoidal":
+        elif self.buton8.currentText() == "Sinuzoidal":
             pass
 
+
     def def_apply(self):
-        pass
+        if self.stimodour1.isChecked():
+            try:
+                while True:
+                        time.sleep(self.delayTime)
+
+                        GPIO.output(self.valve2, GPIO.LOW)
+                        GPIO.output(self.valve1, GPIO.HIGH)  # odour1
+                        GPIO.output(self.valve4, GPIO.HIGH)
+                        GPIO.output(self.valve5, GPIO.HIGH)
+
+                        GPIO.output(self.valve3, GPIO.LOW)
+                        GPIO.output(self.valve6, GPIO.LOW)
+
+                        time.sleep(self.odorTime)
+
+                        GPIO.output(self.valve1, GPIO.LOW)
+                        GPIO.output(self.valve2, GPIO.LOW)
+                        GPIO.output(self.valve4, GPIO.LOW)
+                        GPIO.output(self.valve5, GPIO.LOW)
+                        GPIO.output(self.valve3, GPIO.HIGH)
+                        GPIO.output(self.valve6, GPIO.HIGH)
+
+                        time.sleep(self.airTime)
+
+            except KeyboardInterrupt:
+
+                GPIO.output(self.valve1, GPIO.LOW)
+                GPIO.output(self.valve2, GPIO.LOW)
+                GPIO.output(self.valve4, GPIO.LOW)
+                GPIO.output(self.valve5, GPIO.LOW)
+                GPIO.output(self.valve3, GPIO.HIGH)
+                GPIO.output(self.valve6, GPIO.HIGH)
+
+                GPIO.cleanup()  # cleanup all GPIO
+
+
     def def_cancel(self):
+        GPIO.cleanup()
         sys.exit(app.exec())
 
 
-if __name__=="__main__":
-    app=QApplication(sys.argv)
-    created=Ana_pencere()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    created = Ana_pencere()
     sys.exit(app.exec())
