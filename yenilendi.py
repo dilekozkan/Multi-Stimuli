@@ -174,6 +174,12 @@ class Ana_pencere(QWidget):
         self.odorTime = 1;
         self.sleepTime3 = 5;
         self.delayTime = 2;
+        self.input1 = 29
+        self.input2 = 31       #şu an kullanılmıyor
+        self.input3 = 33
+        self.input4 = 35
+        self.input5 = 37
+
 
 
 
@@ -204,9 +210,33 @@ class Ana_pencere(QWidget):
 
 
     def odour2experiment(self):  # bu kısımları deneyle entegre ettiğimde düzenleyeceğim
-        pass
+        self.valve1 = 3  # VALVE 1
+        self.valve3 = 5  # VALVE 3
+        self.valve2 = 7  # VALVE 2
+        self.valve4 = 11  # VALVE 4
+        self.valve5 = 13  # VALVE 5
+        self.valve6 = 15  # VALVE 6
+
+        # Pin Setup:
+        GPIO.setmode(GPIO.BOARD)
+
+        GPIO.setup(self.valve1, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve2, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve3, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve4, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve5, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve6, GPIO.OUT)  # PWM pin set as output
+
+        GPIO.output(self.valve1, GPIO.LOW)
+        GPIO.output(self.valve2, GPIO.LOW)
+        GPIO.output(self.valve4, GPIO.LOW)
+        GPIO.output(self.valve5, GPIO.LOW)
+        GPIO.output(self.valve3, GPIO.HIGH)
+        GPIO.output(self.valve6, GPIO.HIGH)
 
     def experiment2(self):
+        # Pin Setup:
+        GPIO.setmode(GPIO.BOARD)
         if self.stim2.isChecked():
             pass
 
@@ -278,7 +308,6 @@ class Ana_pencere(QWidget):
                 while True:
                         time.sleep(self.delayTime)
 
-                        GPIO.output(self.valve2, GPIO.LOW)
                         GPIO.output(self.valve1, GPIO.HIGH)  # odour1
                         GPIO.output(self.valve4, GPIO.HIGH)
                         GPIO.output(self.valve5, GPIO.HIGH)
@@ -289,7 +318,6 @@ class Ana_pencere(QWidget):
                         time.sleep(self.odorTime)
 
                         GPIO.output(self.valve1, GPIO.LOW)
-                        GPIO.output(self.valve2, GPIO.LOW)
                         GPIO.output(self.valve4, GPIO.LOW)
                         GPIO.output(self.valve5, GPIO.LOW)
                         GPIO.output(self.valve3, GPIO.HIGH)
@@ -300,6 +328,40 @@ class Ana_pencere(QWidget):
             except KeyboardInterrupt:
 
                 GPIO.output(self.valve1, GPIO.LOW)
+                GPIO.output(self.valve4, GPIO.LOW)
+                GPIO.output(self.valve5, GPIO.LOW)
+                GPIO.output(self.valve3, GPIO.HIGH)
+                GPIO.output(self.valve6, GPIO.HIGH)
+
+                GPIO.cleanup()  # cleanup all GPIO
+
+        if self.stimodour2.isChecked():
+            try:
+                while True:
+                        time.sleep(self.delayTime)
+
+
+                        GPIO.output(self.valve2, GPIO.HIGH)  # odour2
+                        GPIO.output(self.valve4, GPIO.HIGH)
+                        GPIO.output(self.valve5, GPIO.HIGH)
+
+                        GPIO.output(self.valve3, GPIO.LOW)
+                        GPIO.output(self.valve6, GPIO.LOW)
+
+                        time.sleep(self.odorTime)
+
+
+                        GPIO.output(self.valve2, GPIO.LOW)
+                        GPIO.output(self.valve4, GPIO.LOW)
+                        GPIO.output(self.valve5, GPIO.LOW)
+                        GPIO.output(self.valve3, GPIO.HIGH)
+                        GPIO.output(self.valve6, GPIO.HIGH)
+
+                        time.sleep(self.airTime)
+
+            except KeyboardInterrupt:
+
+
                 GPIO.output(self.valve2, GPIO.LOW)
                 GPIO.output(self.valve4, GPIO.LOW)
                 GPIO.output(self.valve5, GPIO.LOW)
