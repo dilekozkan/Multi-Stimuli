@@ -26,6 +26,8 @@ class Ana_pencere(QWidget):
         self.main_widget.setFixedSize(900, 600)
         # self.main_widget.setMinimumSize(900, 600)
         # self.main_widget.setMaximumSize(900, 600)
+        
+        #CREATING GUI...
 
         self.stimodour1 = QCheckBox()
         self.stimodour2 = QCheckBox()
@@ -55,6 +57,8 @@ class Ana_pencere(QWidget):
         self.initialise = QLabel("Start Time of Experiment ")
         self.initialise.setFont(QFont("Amble", 11, QFont.Bold))
         self.initialise.setAlignment(Qt.AlignRight)
+        
+        #CREATING GUI...
 
         self.kutu1.addWidget(self.tipler)
         self.kutu1.addWidget(self.frekans)
@@ -101,7 +105,6 @@ class Ana_pencere(QWidget):
         self.kutu3.addWidget(self.buton6)
         self.kutu3.addWidget(self.buton9)
 
-
         self.kutu4 = QHBoxLayout()
         self.label3 = QLabel("   Visual")
         self.label3.setFont(QFont("Amble", 11))
@@ -125,7 +128,9 @@ class Ana_pencere(QWidget):
         self.kutu5.addWidget(self.buton4)
         self.kutu5.addWidget(self.buton8)
         self.kutu5.addWidget(self.buton11)
-
+        
+        #CREATING GUI...
+        
         self.odour1buton2.addItem(" ")
         self.odour1buton2.addItem("Binary")
         self.odour2buton2.addItem(" ")
@@ -171,7 +176,9 @@ class Ana_pencere(QWidget):
         self.frequency_experiment.setFixedSize(100, 25)
         self.numberofexperiment = 1
         self.frequency_experiment.setValue(self.numberofexperiment)
-
+        
+        #CREATING GUI....
+        
         self.information1.addWidget(self.time_label)
         self.information1.addWidget(self.time_choose)
         self.information2.addWidget(self.frequency_label)
@@ -213,16 +220,10 @@ class Ana_pencere(QWidget):
 
         self.main_widget.setLayout(self.form)
         self.main_widget.show()
+        
+        #CREATING FUNCTIONS AND GPIO
 
-
-        self.thread = thread()
-
-
-
-
-
-
-
+     
         """self.ttl_out = 16  # TTL Output
         GPIO.setup(self.ttl_out, GPIO.IN)
         self.var1 = GPIO.input(self.ttl_out)"""
@@ -346,19 +347,13 @@ class Ana_pencere(QWidget):
     def function_start(self):
         pass
 
-
-
     """
     for i in range(1, self.numberofexperiment+1)
 
     """
 
     def function_cancel(self):
-        print("geldi")
-        if not self.thread.isRunning():
-            self.cancel.setEnabled(True)
-            self.thread.start()
-
+        pass
         """!! self.apply.running=False
 
         GPIO.output(self.valve2, GPIO.LOW)
