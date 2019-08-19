@@ -1,0 +1,49 @@
+﻿
+Qt Multimedia
+Classes for audio, video, radio and camera functionality.
+Qt Multimedia Widgets
+Widget-based classes for implementing multimedia functionality.
+Qt Network
+Classes to make network programming easier and more portable.
+
+Qt Quick
+A declarative framework for building highly dynamic applications with custom user interfaces.
+
+Qt Quick Controls
+Provides lightweight QML types for creating performant user interfaces for desktop, embedded, and mobile devices. These types employ a simple styling architecture and are very efficient.
+Qt Quick Dialogs
+Types for creating and interacting with system dialogs from a Qt Quick application.
+
+Qt 3D
+All
+All
+Functionality for near-realtime simulation systems with support for 2D and 3D rendering.
+
+Qt Bluetooth
+All
+Android, iOS, Linux, macOS, and WinRT (*)
+Provides access to Bluetooth hardware.
+
+Qt Remote Objects
+All
+All
+Provides an easy to use mechanism for sharing a QObject's API (Properties/Signals/Slots) between processes or devices.
+
+Qt Sensors
+All
+Android, Qt for iOS, WinRT, Mer, and QNX.
+Provides access to sensor hardware and motion gesture recognition.
+
+Qt Serial Port
+All
+Windows, Linux, macOS, and QNX.
+Provides access to hardware and virtual serial ports.
+
+
+**
+event handler
+**
+
+Scribble Example
+The Scribble example shows how to reimplement some of QWidget's event handlers to receive the events generated for the application's widgets.
+
