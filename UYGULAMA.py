@@ -3,7 +3,7 @@ import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import time
 
 class MainWindow(QWidget):
