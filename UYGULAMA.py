@@ -3,8 +3,148 @@ import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
+
+#THREAD CLASS  (PARALLEL PROGRAMMING)
+
+class StimThread(QThread):
+    def run(self):
+        # Pin Definitons:
+        self.valve1 = 3  # VALVE 1
+        self.valve3 = 5  # VALVE 3
+        self.valve2 = 7  # VALVE 2
+        self.valve4 = 11  # VALVE 4
+        self.valve5 = 13  # VALVE 5
+        self.valve6 = 15  # VALVE 6
+        self.pin_visual = 12
+        self.pin_audio = 16
+        self.pin_empty = 20  # DOES NOT EXIST NOW
+        self.pin_whisker = 21
+
+        # Pin Setup:
+        GPIO.setmode(GPIO.BOARD)
+
+        GPIO.setup(self.valve1, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve2, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve3, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve4, GPIO.OUT)  # LED pin set as output
+        GPIO.setup(self.valve5, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.valve6, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.pin_visual, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.pin_audio, GPIO.OUT)  # PWM pin set as output
+        GPIO.setup(self.pin_whisker, GPIO.OUT)  # PWM pin set as output
+
+        GPIO.output(self.valve1, GPIO.LOW)  # Default
+        GPIO.output(self.valve2, GPIO.LOW)
+        GPIO.output(self.valve4, GPIO.LOW)
+        GPIO.output(self.valve5, GPIO.LOW)
+        GPIO.output(self.valve3, GPIO.HIGH)
+        GPIO.output(self.valve6, GPIO.HIGH)
+
+        self.time_odour1 = 0   #timer of odour1 experiment's duration (second by second)
+        self.time_odour2 = 0   #timer of odour2 experiment's duration (second by second)
+
+        self.counter1 = 0  #counter of repetition odour1
+        self.counter2 = 0  #counter of repetition odour2
+        self.counter3 = 0  #counter of repetition whisker
+        self.counter4 = 0  #counter of repetition auditory
+        self.counter5 = 0  #counter of repetition visual
+
+        #self.totaltime=delay+length+off (total time of one experiment)
+        self.totaltime_odour1 = delay_odour1 + length_odour1 + offtime_odour1
+        self.totaltime_odour2 = delay_odour2 + length_odour2 + offtime_odour2
+
+
+        while True:
+            if mainWindow.odour1_flag == 1 and self.counter1 < repetition_odour1:
+                self.odour1()
+
+
+
+            if mainWindow.odour2_flag == 1 and self.counter2 < repetition_odour2:
+                self.odour2()
+
+            time.sleep(1)
+            self.time_odour1 += 1
+            self.time_odour2 += 1
+
+            if mainWindow.odour1_flag == 1 and self.time_odour1 == self.totaltime_odour1 :
+                self.counter1 += 1
+                print("Time = ", self.time_odour1, "Odour1 Experiment Completed", self.counter1, "\n")
+                self.time_odour1 = 0
+                if self.counter1 == repetition_odour1:
+                    mainWindow.odour1_flag = 0
+
+
+            if mainWindow.odour2_flag == 1 and self.time_odour2 == self.totaltime_odour2:
+                self.counter2 += 1
+                print("Time = ",self.time_odour2,"Odour2 Experiment Completed",self.counter2,"\n")
+                self.time_odour2 = 0
+                if self.counter2 == repetition_odour2:
+                    mainWindow.odour2_flag = 0
+
+
+
+    def odour1(self):
+        print("Duration of Odour1 Experiment: ", self.time_odour1, "\n")
+        if 0 <= self.time_odour1 < delay_odour1:
+
+            GPIO.output(self.valve1, GPIO.LOW)
+            GPIO.output(self.valve4, GPIO.LOW)
+            GPIO.output(self.valve5, GPIO.LOW)
+            GPIO.output(self.valve3, GPIO.HIGH)
+            GPIO.output(self.valve6, GPIO.HIGH)
+            print("Time = ", self.time_odour1, " Odour1 in Delay\n")
+
+
+        elif delay_odour1 <= self.time_odour1 < delay_odour1 + length_odour1:
+
+            GPIO.output(self.valve1, GPIO.HIGH)  # Odour1 started
+            GPIO.output(self.valve4, GPIO.HIGH)
+            GPIO.output(self.valve5, GPIO.HIGH)
+            GPIO.output(self.valve3, GPIO.LOW)
+            GPIO.output(self.valve6, GPIO.LOW)
+            print("Time =", self.time_odour1, " Odour1 in Stim\n")
+
+        elif delay_odour1 + length_odour1 <= self.time_odour1 < self.totaltime_odour1:
+
+            GPIO.output(self.valve1, GPIO.LOW)
+            GPIO.output(self.valve4, GPIO.LOW)
+            GPIO.output(self.valve5, GPIO.LOW)
+            GPIO.output(self.valve3, GPIO.HIGH)
+            GPIO.output(self.valve6, GPIO.HIGH)
+            print("Time =", self.time_odour1, " Odour1 in OffTime\n")
+    def odour2(self):
+        print("Duration of Odour2 Experiment: ", self.time_odour2, "\n")
+        if 0 <= self.time_odour2 < delay_odour2:
+
+            GPIO.output(self.valve2, GPIO.LOW)
+            GPIO.output(self.valve4, GPIO.LOW)
+            GPIO.output(self.valve5, GPIO.LOW)
+            GPIO.output(self.valve3, GPIO.HIGH)
+            GPIO.output(self.valve6, GPIO.HIGH)
+            print("Time= ", self.time_odour2, " Odour2 in Delay\n ")
+
+
+        elif delay_odour2 <= self.time_odour2 < delay_odour2 + length_odour2:
+
+            GPIO.output(self.valve2, GPIO.HIGH)  # Odour2 started
+            GPIO.output(self.valve4, GPIO.HIGH)
+            GPIO.output(self.valve5, GPIO.HIGH)
+            GPIO.output(self.valve3, GPIO.LOW)
+            GPIO.output(self.valve6, GPIO.LOW)
+
+            print("Time= ", self.time_odour2, " Odour2 in Stim\n ")
+
+        elif delay_odour2 + length_odour2 <= self.time_odour2 < self.totaltime_odour2:
+
+            GPIO.output(self.valve2, GPIO.LOW)
+            GPIO.output(self.valve4, GPIO.LOW)
+            GPIO.output(self.valve5, GPIO.LOW)
+            GPIO.output(self.valve3, GPIO.HIGH)
+            GPIO.output(self.valve6, GPIO.HIGH)
+            print("Time= ", self.time_odour2, " Odour2 in OffTime\n")
 
 class MainWindow(QWidget):
 
@@ -21,11 +161,7 @@ class MainWindow(QWidget):
 
         # CREATING SELECTIONS...
 
-        self.odour1_flag = 0
-        self.odour2_flag = 0
-        self.whisker_flag = 0
-        self.auditory_flag = 0
-        self.visual_flag = 0
+
 
         self.stimodour1 = QCheckBox()
         self.stimodour2 = QCheckBox()
@@ -216,12 +352,22 @@ class MainWindow(QWidget):
 
     def function_start(self):
 
-        #CHECK THE SELECTIONS
+        #CHECK THE SELECTIONS  AND  ASSIGNMENT OF USER'S VALUES
+
+
+        self.odour1_flag=0
+        self.odour2_flag=0
+        self.whisker_flag=0
+        self.auditory_flag=0
+        self.visual_flag=0
+
 
         if self.stimodour1.isChecked():
             self.odour1_flag = 1
+
         if self.stimodour2.isChecked():
             self.odour2_flag = 1
+
         if self.whisker.isChecked():
             self.whisker_flag = 1
         if self.auditory.isChecked():
@@ -229,38 +375,42 @@ class MainWindow(QWidget):
         if self.visual.isChecked():
             self.visual_flag = 1
 
-        # ASSIGNMENT OF USER'S VALUES
 
-        self.delay_odour1 = self.odour1buton1.value()
-        self.length_odour1 = self.odour1buton2.value()
-        self.offtime_odour1 = self.odour1buton3.value()
-        self.repetition_odour1 = self.odour1buton6.value()
+        global delay_odour1, length_odour1, offtime_odour1, repetition_odour1
+        delay_odour1 = self.odour1buton1.value()
+        length_odour1 = self.odour1buton2.value()
+        offtime_odour1 = self.odour1buton3.value()
+        repetition_odour1 = self.odour1buton6.value()
 
-        self.delay_odour2 = self.odour2buton1.value()
-        self.length_odour2 = self.odour2buton2.value()
-        self.offtime_odour2 = self.odour2buton3.value()
-        self.repetition_odour2 = self.odour2buton6.value()
+        global delay_odour2, length_odour2, offtime_odour2, repetition_odour2
+        delay_odour2 = self.odour2buton1.value()
+        length_odour2 = self.odour2buton2.value()
+        offtime_odour2 = self.odour2buton3.value()
+        repetition_odour2 = self.odour2buton6.value()
 
-        self.delay_whisker = self.buton2.value()
-        self.length_whisker = self.buton6.value()
-        self.offtime_whisker = self.buton9.value()
-        self.frequency_whisker = self.buton12.value()
-        self.amplitude_whisker = self.buton15.value()
-        self.repetition_whisker = self.buton18.value()
+        global delay_whisker, length_whisker, offtime_whisker,frequency_whisker,amplitude_whisker, repetition_whisker
+        delay_whisker = self.buton2.value()
+        length_whisker = self.buton6.value()
+        offtime_whisker = self.buton9.value()
+        frequency_whisker = self.buton12.value()
+        amplitude_whisker = self.buton15.value()
+        repetition_whisker = self.buton18.value()
 
-        self.delay_auditory = self.buton3.value()
-        self.length_auditory = self.buton7.value()
-        self.offtime_auditory = self.buton10.value()
-        self.frequency_auditory = self.buton13.value()
-        self.amplitude_auditory = self.buton16.value()
-        self.repetition_auditory = self.buton19.value()
+        global delay_auditory, length_auditory, offtime_auditory, frequency_auditory, amplitude_auditory, repetition_auditory
+        delay_auditory = self.buton3.value()
+        length_auditory = self.buton7.value()
+        offtime_auditory = self.buton10.value()
+        frequency_auditory = self.buton13.value()
+        amplitude_auditory = self.buton16.value()
+        repetition_auditory = self.buton19.value()
 
-        self.delay_visual = self.buton4.value()
-        self.length_visual = self.buton8.value()
-        self.offtime_visual = self.buton11.value()
-        self.frequency_visual = self.buton14.value()
-        self.amplitude_visual = self.buton17.value()
-        self.repetition_visual = self.buton20.value()
+        global delay_visual, length_visual, offtime_visual, frequency_visual, amplitude_visual, repetition_visual
+        delay_visual = self.buton4.value()
+        length_visual = self.buton8.value()
+        offtime_visual = self.buton11.value()
+        frequency_visual = self.buton14.value()
+        amplitude_visual = self.buton17.value()
+        repetition_visual = self.buton20.value()
 
         #MAKE DISABLED OF SELECTIONS
 
@@ -285,139 +435,6 @@ class MainWindow(QWidget):
         self.whisker.setEnabled(1)
         self.visual.setEnabled(1)
         self.auditory.setEnabled(1)
-
-        #THREAD CLASS  (PARALLEL PROGRAMMING)
-
-class StimThread(QThread):
-    def run(self):
-        # Pin Definitons:
-        self.valve1 = 3  # VALVE 1
-        self.valve3 = 5  # VALVE 3
-        self.valve2 = 7  # VALVE 2
-        self.valve4 = 11  # VALVE 4
-        self.valve5 = 13  # VALVE 5
-        self.valve6 = 15  # VALVE 6
-        self.pin_visual = 12
-        self.pin_audio = 16
-        self.pin_empty = 20  # DOES NOT EXIST NOW
-        self.pin_whisker = 21
-
-        # Pin Setup:
-        GPIO.setmode(GPIO.BOARD)
-
-        GPIO.setup(self.valve1, GPIO.OUT)  # LED pin set as output
-        GPIO.setup(self.valve2, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.valve3, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.valve4, GPIO.OUT)  # LED pin set as output
-        GPIO.setup(self.valve5, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.valve6, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.pin_visual, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.pin_audio, GPIO.OUT)  # PWM pin set as output
-        GPIO.setup(self.pin_whisker, GPIO.OUT)  # PWM pin set as output
-
-        GPIO.output(self.valve1, GPIO.LOW)  # Default
-        GPIO.output(self.valve2, GPIO.LOW)
-        GPIO.output(self.valve4, GPIO.LOW)
-        GPIO.output(self.valve5, GPIO.LOW)
-        GPIO.output(self.valve3, GPIO.HIGH)
-        GPIO.output(self.valve6, GPIO.HIGH)
-
-        self.time_odour1 = 0   #timer of odour1 experiment's duration (second by second)
-        self.time_odour2 = 0   #timer of odour2 experiment's duration (second by second)
-
-        self.counter1 = 0  #counter of repetition odour1
-        self.counter2 = 0  #counter of repetition odour2
-        self.counter3 = 0  #counter of repetition whisker
-        self.counter4 = 0  #counter of repetition auditory
-        self.counter5 = 0  #counter of repetition visual
-
-        #totaltime=delay+length+off (totaltime of one experiment)
-
-        self.totaltimeodour1=mainWindow.delay_odour1+mainWindow.length_odour1+mainWindow.offtime_odour1
-        self.totaltimeodour2 = mainWindow.delay_odour2 + mainWindow.length_odour2 + mainWindow.offtime_odour2
-
-        while True:
-            if mainWindow.odour1_flag == 1 and self.counter1 < mainWindow.repetition_odour1:
-                self.odour1()
-
-            if mainWindow.odour2_flag == 1 and self.counter2 < mainWindow.repetition_odour2:
-                self.odour2()
-
-            time.sleep(1)
-            self.time_odour1 += 1
-            self.time_odour2 += 1
-            if self.time_odour1 == self.totaltimeodour1:
-                self.counter1 += 1
-                print(self.counter1, ". deney tamamlandi")         #sunu çalişmayi nasil durdururum, sadece burda hata !
-                self.time_odour1 = 0
-                if self.counter1 == mainWindow.repetition_odour1:
-                    self.odour1flag = 0
-
-            if self.time_odour2 == self.totaltimeodour2:
-                self.counter2 += 1
-                print(self.counter2,". deney tamamlandi")
-                self.time_odour2 = 0
-                if self.counter2 == mainWindow.repetition_odour2:
-                    self.odour2flag = 0
-    def odour1(self):
-        print("odour1e girildi, zaman : ", self.time_odour1)
-        if 0 <= self.time_odour1 < mainWindow.delay_odour1:
-
-            GPIO.output(self.valve1, GPIO.LOW)
-            GPIO.output(self.valve4, GPIO.LOW)
-            GPIO.output(self.valve5, GPIO.LOW)
-            GPIO.output(self.valve3, GPIO.HIGH)
-            GPIO.output(self.valve6, GPIO.HIGH)
-            print("odour1 delay. zaman = ", self.time_odour1)
-
-
-        elif mainWindow.delay_odour1 <= self.time_odour1 < mainWindow.delay_odour1 + mainWindow.length_odour1:
-
-            GPIO.output(self.valve1, GPIO.HIGH)  # Odour1 started
-            GPIO.output(self.valve4, GPIO.HIGH)
-            GPIO.output(self.valve5, GPIO.HIGH)
-            GPIO.output(self.valve3, GPIO.LOW)
-            GPIO.output(self.valve6, GPIO.LOW)
-            print("odour1 stim. zaman =", self.time_odour1)
-
-        elif mainWindow.delay_odour1 + mainWindow.length_odour1 <= self.time_odour1 < self.totaltimeodour1:
-
-            GPIO.output(self.valve1, GPIO.LOW)
-            GPIO.output(self.valve4, GPIO.LOW)
-            GPIO.output(self.valve5, GPIO.LOW)
-            GPIO.output(self.valve3, GPIO.HIGH)
-            GPIO.output(self.valve6, GPIO.HIGH)
-            print("off. zaman =", self.time_odour1)
-    def odour2(self):
-        print("zaman= ", self.time_odour2)
-        if 0 <= self.time_odour2 < mainWindow.delay_odour2:
-
-            GPIO.output(self.valve2, GPIO.LOW)
-            GPIO.output(self.valve4, GPIO.LOW)
-            GPIO.output(self.valve5, GPIO.LOW)
-            GPIO.output(self.valve3, GPIO.HIGH)
-            GPIO.output(self.valve6, GPIO.HIGH)
-            print("zaman= ", self.time_odour2, "odour2 delay")
-
-
-        elif mainWindow.delay_odour2 <= self.time_odour2 < mainWindow.delay_odour2 + mainWindow.length_odour2:
-
-            GPIO.output(self.valve2, GPIO.HIGH)  # Odour2 started
-            GPIO.output(self.valve4, GPIO.HIGH)
-            GPIO.output(self.valve5, GPIO.HIGH)
-            GPIO.output(self.valve3, GPIO.LOW)
-            GPIO.output(self.valve6, GPIO.LOW)
-
-            print("zaman= ", self.time_odour2, "odour2 koku")
-
-        elif mainWindow.delay_odour2 + mainWindow.length_odour2 <= self.time_odour2 < self.totaltimeodour2:
-
-            GPIO.output(self.valve2, GPIO.LOW)
-            GPIO.output(self.valve4, GPIO.LOW)
-            GPIO.output(self.valve5, GPIO.LOW)
-            GPIO.output(self.valve3, GPIO.HIGH)
-            GPIO.output(self.valve6, GPIO.HIGH)
-            print("zaman= ", self.time_odour2, "odour2 off")
 
 
 if __name__ == "__main__":
