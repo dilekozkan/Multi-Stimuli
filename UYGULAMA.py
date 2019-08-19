@@ -10,6 +10,7 @@ import time
 
 class StimThread(QThread):
     def run(self):
+        self.running=1
         # Pin Definitons:
         self.valve1 = 3  # VALVE 1
         self.valve3 = 5  # VALVE 3
@@ -56,20 +57,20 @@ class StimThread(QThread):
         self.totaltime_odour2 = delay_odour2 + length_odour2 + offtime_odour2
 
 
-        while True:
+        while self.running:
             if mainWindow.odour1_flag == 1 and self.counter1 < repetition_odour1:
                 self.odour1()
-
-
 
             if mainWindow.odour2_flag == 1 and self.counter2 < repetition_odour2:
                 self.odour2()
 
             time.sleep(1)
-            self.time_odour1 += 1
-            self.time_odour2 += 1
+            if mainWindow.odour1_flag == 1 and repetition_odour1>0 and self.totaltime_odour1>0:
+                self.time_odour1 += 1
+            if mainWindow.odour2_flag == 1 and repetition_odour2>0 and self.totaltime_odour2>0:
+                self.time_odour2 += 1
 
-            if mainWindow.odour1_flag == 1 and self.time_odour1 == self.totaltime_odour1 :
+            if mainWindow.odour1_flag == 1 and self.time_odour1 == self.totaltime_odour1 and repetition_odour1>0 :
                 self.counter1 += 1
                 print("Time = ", self.time_odour1, "Odour1 Experiment Completed", self.counter1, "\n")
                 self.time_odour1 = 0
@@ -77,7 +78,7 @@ class StimThread(QThread):
                     mainWindow.odour1_flag = 0
 
 
-            if mainWindow.odour2_flag == 1 and self.time_odour2 == self.totaltime_odour2:
+            if mainWindow.odour2_flag == 1 and self.time_odour2 == self.totaltime_odour2 and repetition_odour2>0:
                 self.counter2 += 1
                 print("Time = ",self.time_odour2,"Odour2 Experiment Completed",self.counter2,"\n")
                 self.time_odour2 = 0
@@ -361,7 +362,6 @@ class MainWindow(QWidget):
         self.auditory_flag=0
         self.visual_flag=0
 
-
         if self.stimodour1.isChecked():
             self.odour1_flag = 1
 
@@ -430,11 +430,17 @@ class MainWindow(QWidget):
 
         # MAKE ENABLED OF SELECTIONS
 
+        self.stimThread.running=0
+
         self.stimodour1.setEnabled(1)
         self.stimodour2.setEnabled(1)
         self.whisker.setEnabled(1)
         self.visual.setEnabled(1)
         self.auditory.setEnabled(1)
+
+
+
+
 
 
 if __name__ == "__main__":
