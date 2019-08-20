@@ -10,7 +10,7 @@ import time
 
 class StimThread(QThread):
     def run(self):
-        self.running=1
+
         # Pin Definitons:
         self.valve1 = 3  # VALVE 1
         self.valve3 = 5  # VALVE 3
@@ -57,7 +57,7 @@ class StimThread(QThread):
         self.totaltime_odour2 = delay_odour2 + length_odour2 + offtime_odour2
 
 
-        while self.running:
+        while mainWindow.running:
             if mainWindow.odour1_flag == 1 and self.counter1 < repetition_odour1:
                 self.odour1()
 
@@ -84,6 +84,12 @@ class StimThread(QThread):
                 self.time_odour2 = 0
                 if self.counter2 == repetition_odour2:
                     mainWindow.odour2_flag = 0
+
+            if mainWindow.odour1_flag == 0 and mainWindow.odour2_flag==0 and mainWindow.whisker_flag ==0 and mainWindow.auditory_flag==0 and mainWindow.visual_flag==0:
+                mainWindow.function_cancel()
+                GPIO.cleanup()    # cleanup all GPIO
+                time.sleep(1)
+                break
 
 
 
@@ -161,8 +167,6 @@ class MainWindow(QWidget):
         # self.main_widget.setMaximumSize(900, 600)
 
         # CREATING SELECTIONS...
-
-
 
         self.stimodour1 = QCheckBox()
         self.stimodour2 = QCheckBox()
@@ -349,12 +353,15 @@ class MainWindow(QWidget):
         self.main_widget.setLayout(self.form)
         self.main_widget.show()
 
+
+
         # THE MOST IMPORTANT PART: START, THREAD AND CANCEL !
 
     def function_start(self):
 
         #CHECK THE SELECTIONS  AND  ASSIGNMENT OF USER'S VALUES
 
+        self.running = 1  # FLAG FOR THREAD RUN
 
         self.odour1_flag=0
         self.odour2_flag=0
@@ -430,18 +437,14 @@ class MainWindow(QWidget):
 
         # MAKE ENABLED OF SELECTIONS
 
-        self.stimThread.running=0
-
         self.stimodour1.setEnabled(1)
         self.stimodour2.setEnabled(1)
         self.whisker.setEnabled(1)
         self.visual.setEnabled(1)
         self.auditory.setEnabled(1)
 
-
-
-
-
+        global running
+        self.running=0
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
