@@ -67,9 +67,8 @@ class StimThread(QThread):
         self.totaltime_whisker = delay_whisker + length_whisker + offtime_whisker
         self.totaltime_auditory = delay_auditory + length_auditory + offtime_auditory
 
-        self.x=0   #counter for in .001 second
-        if frequency_whisker>0:
-            self.mod=1000/frequency_whisker
+        self.timer=0   #counter
+        self.sleep_time = 1/frequency_whisker #Default 500 ms and its alterable
 
 
         while mainWindow.running:
@@ -86,18 +85,24 @@ class StimThread(QThread):
             if mainWindow.auditory_flag == 1 and self.counter4 < repetition_auditory:
                 self.auditory()
 
-            time.sleep(.001)
-            self.x+=1
+            time.sleep(self.sleep_time)
+
+            if self.sleep_time == 0.5:
+                self.timer += 500
+            elif self.sleep_time == 0.2:
+                self.timer += 200
+            elif self.sleep_time == 0.1:
+                self.timer += 100
 
             #ATTENTION!!   denk gelir mi 1000e yoksa kayma olur mu mesela ben 0.002 deyince ve esit bin oldugunda deyince esitlenemedi
             if mainWindow.odour1_flag == 1 and repetition_odour1>0 and self.totaltime_odour1>0:
-                if self.x %1000 == 0:
+                if self.timer %1000 == 0:
                     self.time_odour1 += 1
             if mainWindow.odour2_flag == 1 and repetition_odour2>0 and self.totaltime_odour2>0:
-                if self.x %1000 == 0:
+                if self.timer %1000 == 0:
                     self.time_odour2 += 1
             if mainWindow.whisker_flag == 1 and repetition_whisker>0 and self.totaltime_whisker>0:
-                if self.x %1000 == 0:
+                if self.timer %1000 == 0:
                     self.time_whisker += 1
             if mainWindow.breath_flag == 1:
                 pass
@@ -117,14 +122,14 @@ class StimThread(QThread):
                 if self.counter2 == repetition_odour2:
                     mainWindow.odour2_flag = 0
 
-            if mainWindow.whisker == 1 and self.time_whisker == self.totaltime_whisker and repetition_whisker>0 :
+            if mainWindow.whisker_flag == 1 and self.time_whisker == self.totaltime_whisker and repetition_whisker>0 :
                 self.counter3 += 1
                 print("Time = ", self.time_whisker, "Whisker Experiment Completed", self.counter3, "\n")
                 self.time_whisker = 0
                 if self.counter3 == repetition_whisker:
                     mainWindow.whisker_flag = 0
 
-            if mainWindow.auditory == 1 and self.time_auditory == self.totaltime_auditory and repetition_auditory>0 :
+            if mainWindow.auditory_flag == 1 and self.time_auditory == self.totaltime_auditory and repetition_auditory>0 :
                 self.counter4 += 1
                 print("Time = ", self.time_auditory, "Auditory Experiment Completed", self.counter4, "\n")
                 self.time_auditory = 0
@@ -137,10 +142,18 @@ class StimThread(QThread):
                 time.sleep(1)
                 break
 
+            if repetition_odour1==0 and repetition_odour2==0 and repetition_whisker==0 and repetition_auditory==0:
+                print("Repetititons don't exist!")    #is it needed?
+                mainWindow.function_cancel()
+                GPIO.cleanup()  # cleanup all GPIO
+                time.sleep(1)
+                break
+
+
 
 
     def odour1(self):                                        #Odour1 experiment's function
-        print("Duration of Odour1 Experiment: ", self.time_odour1, "\n")
+        print("Duration of Odour1 Experiment: ", self.timer, "\n")
         if 0 <= self.time_odour1 < delay_odour1:
 
             GPIO.output(self.valve2, GPIO.LOW)
@@ -148,7 +161,7 @@ class StimThread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            print("Time = ", self.time_odour1, " Odour1 in Delay\n")
+            print("Time = ", self.timer, " Odour1 in Delay\n")
 
 
         elif delay_odour1 <= self.time_odour1 < delay_odour1 + length_odour1:
@@ -158,7 +171,7 @@ class StimThread(QThread):
             GPIO.output(self.valve5, GPIO.HIGH)
             GPIO.output(self.valve3, GPIO.LOW)
             GPIO.output(self.valve6, GPIO.LOW)
-            print("Time =", self.time_odour1, " Odour1 in Stim\n")
+            print("Time =", self.timer, " Odour1 in Stim\n")
 
         elif delay_odour1 + length_odour1 <= self.time_odour1 < self.totaltime_odour1:
 
@@ -167,10 +180,10 @@ class StimThread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            print("Time =", self.time_odour1, " Odour1 in OffTime\n")
+            print("Time =", self.timer, " Odour1 in OffTime\n")
 
     def odour2(self):                                           #Odour2 experiment's function
-        print("Duration of Odour2 Experiment: ", self.time_odour2, "\n")
+        print("Duration of Odour2 Experiment: ", self.timer, "\n")
         if 0 <= self.time_odour2 < delay_odour2:
 
             GPIO.output(self.valve1, GPIO.LOW)
@@ -178,7 +191,7 @@ class StimThread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            print("Time= ", self.time_odour2, " Odour2 in Delay\n ")
+            print("Time= ", self.timer, " Odour2 in Delay\n ")
 
 
         elif delay_odour2 <= self.time_odour2 < delay_odour2 + length_odour2:
@@ -189,7 +202,7 @@ class StimThread(QThread):
             GPIO.output(self.valve3, GPIO.LOW)
             GPIO.output(self.valve6, GPIO.LOW)
 
-            print("Time= ", self.time_odour2, " Odour2 in Stim\n ")
+            print("Time= ", self.timer, " Odour2 in Stim\n ")
 
         elif delay_odour2 + length_odour2 <= self.time_odour2 < self.totaltime_odour2:
 
@@ -198,45 +211,45 @@ class StimThread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            print("Time= ", self.time_odour2, " Odour2 in OffTime\n")
+            print("Time= ", self.timer, " Odour2 in OffTime\n")
 
     def whisker(self):                                       #Whisker experiment's function
-        print("Duration of Whisker Experiment: ", self.time_whisker, "\n")
+
+        print("Duration of Whisker Experiment: ", self.timer, "\n")
         if 0 <= self.time_whisker < delay_whisker:
 
             GPIO.output(self.pin2_whisker, GPIO.LOW)
-            print("Time= ", self.time_whisker, " Whisker in Delay\n ")
+            print("Time= ", self.timer, " Whisker in Delay\n ")
 
         elif delay_whisker <= self.time_whisker < delay_whisker + length_whisker:
 
-            if self.x % self.mod == 0:
-                GPIO.output(self.pin2_whisker, GPIO.HIGH)
+                GPIO.output(self.pin2_whisker, GPIO.HIGH)    #HIGH=amplitude_whisker
                 GPIO.output(self.pin2_whisker, GPIO.LOW)
-                #HIGH=amplitude_whisker
-                print("Time= ", self.time_whisker, " Whisker in Stim\n ")
+
+                print("Time= ", self.timer, " Whisker in Stim\n ")
 
         elif delay_whisker + length_whisker <= self.time_whisker < self.totaltime_whisker:
 
             GPIO.output(self.pin2_whisker, GPIO.LOW)
-            print("Time= ", self.time_whisker, " Whisker in OffTime\n ")
+            print("Time= ", self.timer, " Whisker in OffTime\n ")
 
     def auditory(self):                                      #Auditory experiment's function
-        print("Duration of Auditory Experiment: ", self.time_auditory, "\n")
+        print("Duration of Auditory Experiment: ", self.timer, "\n")
         if 0 <= self.time_auditory < delay_auditory:
 
             GPIO.output(self.pin_audio, GPIO.LOW)
-            print("Time= ", self.time_auditory, " Auditory in Delay\n ")
+            print("Time= ", self.timer, " Auditory in Delay\n ")
 
         elif delay_auditory+ length_auditory <= self.time_auditory < self.totaltime_auditory:
 
             GPIO.output(self.pin_audio, GPIO.HIGH)
             #HIGH=amplitude_auditory
-            print("Time= ", self.time_auditory, " Auditory in Stim\n ")
+            print("Time= ", self.timer, " Auditory in Stim\n ")
 
         elif delay_auditory + length_auditory <= self.time_auditory < self.totaltime_auditory:
 
             GPIO.output(self.pin_audio, GPIO.LOW)
-            print("Time= ", self.time_auditory, " Auditory in OffTime\n ")
+            print("Time= ", self.timer, " Auditory in OffTime\n ")
 
 
 class MainWindow(QWidget):
@@ -248,7 +261,7 @@ class MainWindow(QWidget):
         self.main_widget.setGeometry(450, 100, 950, 800)
         self.main_widget.setWindowTitle("MULTI-STIMULI PROCESS")
         self.main_widget.setFont((QFont("Amble", 11)))
-        self.main_widget.setFixedSize(900, 600)
+        self.main_widget.setFixedSize(800, 550)
         #self.main_widget.setMinimumSize(900, 900)
         # self.main_widget.setMaximumSize(900, 600)
 
@@ -264,27 +277,27 @@ class MainWindow(QWidget):
 
         self.titlebox = QHBoxLayout()
         self.gap = QLabel("")
-        self.types = QLabel("Types of Stimulations")
+        self.types = QLabel("Types of Stimulation  ")
         self.types.setFont(QFont("Amble", 11, QFont.Bold))
         self.types.setAlignment(Qt.AlignLeft)
-        self.delay = QLabel("Delay")
+        self.delay = QLabel("Delay         ")
         self.delay.setFont(QFont("Amble", 11, QFont.Bold))
-        self.delay.setAlignment(Qt.AlignHCenter)
-        self.stim_length = QLabel("Length of Stim")
+        self.delay.setAlignment(Qt.AlignLeft)
+        self.stim_length = QLabel("Stim          ")
         self.stim_length.setFont(QFont("Amble", 11, QFont.Bold))
-        self.stim_length.setAlignment(Qt.AlignCenter)
-        self.offtime=QLabel("Off Time")
+        self.stim_length.setAlignment(Qt.AlignLeft)
+        self.offtime=QLabel("Off Time    ")
         self.offtime.setFont(QFont("Amble", 11, QFont.Bold))
-        self.offtime.setAlignment(Qt.AlignHCenter)
-        self.frequency=QLabel("Frequency")
+        self.offtime.setAlignment(Qt.AlignLeft)
+        self.frequency=QLabel("Frequency   ")
         self.frequency.setFont(QFont("Amble", 11, QFont.Bold))
-        self.frequency.setAlignment(Qt.AlignHCenter)
-        self.amplitude=QLabel("Amplitude")
+        self.frequency.setAlignment(Qt.AlignLeft)
+        self.amplitude=QLabel("Amplitude     ")
         self.amplitude.setFont(QFont("Amble", 11, QFont.Bold))
-        self.amplitude.setAlignment(Qt.AlignHCenter)
-        self.repetition=QLabel("Repetition")
+        self.amplitude.setAlignment(Qt.AlignLeft)
+        self.repetition=QLabel("Repetition  ")
         self.repetition.setFont(QFont("Amble", 11, QFont.Bold))
-        self.repetition.setAlignment(Qt.AlignHCenter)
+        self.repetition.setAlignment(Qt.AlignLeft)
 
         # CREATING GUI...
 
@@ -349,7 +362,11 @@ class MainWindow(QWidget):
         self.buton2 = QSpinBox()
         self.buton6 = QSpinBox()
         self.buton9 = QSpinBox()
-        self.buton12 = QSpinBox()
+        self.buton12 = QComboBox()
+        self.buton12.addItem("2")
+        self.buton12.addItem("5")
+        self.buton12.addItem("10")
+        self.buton12.setFixedSize(99,25)
         self.buton15 = QDoubleSpinBox()
         self.buton18= QSpinBox()
 
@@ -490,6 +507,7 @@ class MainWindow(QWidget):
             self.temperature_flag = 1
 
 
+
         global delay_odour1, length_odour1, offtime_odour1, repetition_odour1
         delay_odour1 = self.odour1buton1.value()
         length_odour1 = self.odour1buton2.value()
@@ -506,7 +524,7 @@ class MainWindow(QWidget):
         delay_whisker = self.buton2.value()
         length_whisker = self.buton6.value()
         offtime_whisker = self.buton9.value()
-        frequency_whisker = self.buton12.value()
+        frequency_whisker = int(self.buton12.currentText())
         amplitude_whisker = self.buton15.value()
         repetition_whisker = self.buton18.value()
 
