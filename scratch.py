@@ -23,6 +23,7 @@ class StimThread(QThread):
         self.pin_whisker = 34
         self.pin2_whisker=40
         self.pin_breath=16
+        self.pin_ground=30
         #self.pin_temperature=18
         #self.pin_visual = 32
 
