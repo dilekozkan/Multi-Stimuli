@@ -593,8 +593,7 @@ class MainWindow(QWidget):
         self.running_whisker = 0
         #mW.general_thread.quit()  # thread-safe quit
         mW.whisker_thread.quit()
-        print("general thread situation:", self.general_thread.isFinished(), "whisker thread sit:",self.whisker_thread.isFinished())
-
+        
     def set_enabled(self):
         # MAKE ENABLED OF SELECTIONS
         for i in self.check_list:
