@@ -44,23 +44,17 @@ class Whisker_Thread(QThread):
                     mW.whisker_flag = 0
 
     def whisker(self):
-
         if 0 <= self.time_whisker < mW.delay_whisker:
 
             GPIO.output(self.pin_whisker, GPIO.LOW)
-            #print("Time = ", self.time_whisker, " Whisker in Delay\n")
-
 
         elif mW.delay_whisker <= self.time_whisker < mW.delay_whisker + mW.length_whisker:
 
             GPIO.output(self.pin_whisker, GPIO.HIGH)  # Whisker started
 
-            #print("Time =", self.time_whisker, " Whisker in Stim\n")
-
         elif mW.delay_whisker + mW.length_whisker <= self.time_whisker < mW.totaltime_whisker:
 
             GPIO.output(self.pin_whisker, GPIO.LOW)
-            #print("Time =", self.time_whisker, " Whisker in OffTime\n")
         mW.data_whisker.append(GPIO.input(self.pin_whisker))
 
 
@@ -172,8 +166,6 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            #print("Time = ", self.time_odour1, " Odour1 in Delay\n")
-
 
         elif mW.delay_odour1 <= self.time_odour1 < mW.delay_odour1 + mW.length_odour1:
 
@@ -182,7 +174,6 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.HIGH)
             GPIO.output(self.valve3, GPIO.LOW)
             GPIO.output(self.valve6, GPIO.LOW)
-            #print("Time =", self.time_odour1, " Odour1 in Stim\n")
 
         elif mW.delay_odour1 + mW.length_odour1 <= self.time_odour1 < mW.totaltime_odour1:
 
@@ -191,7 +182,6 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            #print("Time =", self.time_odour1, " Odour1 in OffTime\n")
         mW.data_valve1.append(GPIO.input(self.valve1))   # appending pin status to array of odour1's
 
     def odour2(self):
@@ -203,8 +193,6 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            #print("Time= ", self.time_odour2, " Odour2 in Delay\n ")
-
 
         elif mW.delay_odour2 <= self.time_odour2 < mW.delay_odour2 + mW.length_odour2:
 
@@ -213,7 +201,6 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.HIGH)
             GPIO.output(self.valve3, GPIO.LOW)
             GPIO.output(self.valve6, GPIO.LOW)
-            #print("Time= ", self.time_odour2, " Odour2 in Stim\n ")
 
         elif mW.delay_odour2 + mW.length_odour2 <= self.time_odour2 < mW.totaltime_odour2:
 
@@ -222,22 +209,18 @@ class General_Thread(QThread):
             GPIO.output(self.valve5, GPIO.LOW)
             GPIO.output(self.valve3, GPIO.HIGH)
             GPIO.output(self.valve6, GPIO.HIGH)
-            #print("Time= ", self.time_odour2, " Odour2 in OffTime\n")
         mW.data_valve2.append(GPIO.input(self.valve2))  # appending pin status to array of odour2's
     def auditory(self):
 
         if 0<= self.time_auditory <mW.delay_auditory:
             GPIO.output(self.pin_auditory, GPIO.LOW)
-            #print("Time = ", self.time_auditory, " Auditory in Delay\n")
         elif mW.delay_auditory <= self.time_auditory < mW.delay_auditory + mW.length_auditory:
 
             GPIO.output(self.pin_auditory, GPIO.HIGH)  # Auditive started
-            #print("Time =", self.time_auditory, " Auditory in Stim\n")
 
         elif mW.delay_auditory + mW.length_auditory <= self.time_auditory < mW.totaltime_auditory:
 
             GPIO.output(self.pin_auditory, GPIO.LOW)
-            #print("Time =", self.time_auditory, " Auditory in OffTime\n")
         mW.data_auditory.append(GPIO.input(self.pin_auditory))
     def visual(self):
         pass
