@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import RPi.GPIO as GPIO
 import time
 from datetime import datetime
-import numpy as np
 
 class Whisker_Thread(QThread):
     def __init__(self, parent=None):
